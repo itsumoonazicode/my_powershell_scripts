@@ -1,3 +1,2 @@
 *.json
-!target/deployFromWinSCP.ps1
 target/

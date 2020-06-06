@@ -3,7 +3,8 @@
 	$env = ConvertFrom-Json -InputObject (Get-Content ..\env.json -Raw)
 	# スクリプト自身のパスまでのディレクトリ
 	$scriptPath = Split-Path -Parent ($MyInvocation.Mycommand.Path)
-
+	# リモート接続先のアップロード先フォルダ
+	$remotePath = "/test/"
 	$fileLists = (Get-Content 'lists.txt') -as [string[]]
 	
 	# winscp.dll のパス
@@ -23,7 +24,6 @@
 	{
     #connect
 		$session.Open($sessionOptions)
-		$remotePath = "/test/"
 		
 		foreach($target in $fileLists) {
 			$targetPath = $scriptPath + "\" + $target
