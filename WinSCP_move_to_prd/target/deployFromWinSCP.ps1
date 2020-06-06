@@ -23,36 +23,20 @@
 	{
     #connect
 		$session.Open($sessionOptions)
-		$directory = $session.ListDirectory(".")
 		$remotePath = "/test/"
-
-		
 		
 		foreach($target in $fileLists) {
 			$targetPath = $scriptPath + "\" + $target
-			$targetPath = $targetPath -replace "/", "\"
-			# $files = Get-ChildItem .\target -Recurse | Select-Object -ExpandProperty FullName
-			# $parentLocalPath = Split-Path -Parent (Resolve-Path $target)
+			$localFilePath = $targetPath -replace "/", "\"
 			$parentLocalPath = $scriptPath
-			# Write-Host $scriptPath
-			Write-Host $targetPath
+			$remoteFilePath = [WinSCP.RemotePath]::TranslateLocalPathToRemote($localFilePath, $parentLocalPath, $remotePath)
+
+			$session.PutFiles($localFilePath, $remoteFilePath).Check()
+			Write-Host $localFilePath
 			Write-Host $parentLocalPath
-			$remoteFilePath = 
-				[WinSCP.RemotePath]::TranslateLocalPathToRemote(
-					$targetPath, $parentLocalPath, $remotePath)
-			# if(!($session.FileExists($remoteFilePath))) {
-			# 	$session.CreateDirectory($remoteFilePath)
-			# }
-			# Write-Host $targetPath
 			Write-Host $remoteFilePath
-			$session.PutFiles($targetPath, $remoteFilePath).Check()
 		}
 
-		# foreach($fileInfo in $directory.Files) {
-		# 	Write-Host ("$($fileInfo.Name) with size $($fileInfo.Length), " +
-		# 	"permissions $($fileInfo.FilePermissions) and " +
-		# 	"last modification at $($fileInfo.LastWriteTime)")
-		# }
 	}
 	finally
 	{
