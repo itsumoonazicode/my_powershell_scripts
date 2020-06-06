@@ -1,6 +1,10 @@
 ﻿try
 {
 	$env = ConvertFrom-Json -InputObject (Get-Content .\env.json -Raw)
+	# スクリプト自身のパスまでのディレクトリ
+	$scriptPath = Split-Path -Parent ($MyInvocation.Mycommand.Path)
+
+	$fileLists = (Get-Content 'lists.txt') -as [string[]]
 	
 	# winscp.dll のパス
 	Add-Type -Path 'C:\Program Files (x86)\WinSCP\WinSCPnet.dll'
@@ -18,8 +22,16 @@
 	try
 	{
     #connect
-		$session.Open($sessionOptions)	
+		$session.Open($sessionOptions)
 		$directory = $session.ListDirectory(".")
+		$remotePath = "/test/"
+
+		foreach($target in $fileLists) {
+			$targetPath = $scriptPath + "\" + $target
+			$targetPath = $targetPath -replace "/", "\"
+			Write-Host $targetPath
+			$session.PutFiles($targetPath, $remotePath).Check()
+		}
 
 		foreach($fileInfo in $directory.Files) {
 			Write-Host ("$($fileInfo.Name) with size $($fileInfo.Length), " +
